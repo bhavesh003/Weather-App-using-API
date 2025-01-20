@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f2f4f8; /* Soft light background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333; /* Dark text color for better contrast */
+            text-align: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #4e73df; /* Soft blue color */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Container Styles */
+        .weather-container {
+            background-color: #ffffff; /* Clean white background for content */
+            border-radius: 15px;
+            padding: 40px;
+            width: 320px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .weather-container:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 25px;
+            border: 2px solid #4e73df;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #2e59d9; /* Darker blue when focused */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            background-color: #4e73df; /* Soft blue color for buttons */
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 90%;
+        }
+
+        button:hover {
+            background-color: #2e59d9; /* Darker blue on hover */
+            transform: translateY(-2px);
+        }
+
+        .weather-info {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .weather-info p {
+            margin: 5px 0;
+            color: #555; /* Dark gray text for weather details */
+        }
+
+        /* Error Message Styles */
+        .error {
+            color: #e74a3b; /* Red color for error messages */
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Responsive Styling */
+        @media (max-width: 600px) {
+            .weather-container {
+                width: 90%;
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Weather App</h1>
+
+    <div class="weather-container">
+        <input type="text" id="city" placeholder="Enter city name" />
+        <button id="getWeather">Get Weather</button>
+
+        <div class="weather-info">
+            <p id="temperature"></p>
+            <p id="description"></p>
+            <p id="humidity"></p>
+            <p id="windSpeed"></p>
+            <p id="airQuality"></p>
+            <p id="error" class="error"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('getWeather').addEventListener('click', function() {
+            const city = document.getElementById('city').value.trim();
+            const apiKey = '35ba2335626346c6b0a54133252001'; 
+            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+            // Clear previous results
+            document.getElementById('error').textContent = '';
+            document.getElementById('temperature').textContent = '';
+            document.getElementById('description').textContent = '';
+            document.getElementById('humidity').textContent = '';
+            document.getElementById('windSpeed').textContent = '';
+            document.getElementById('airQuality').textContent = '';
+
+            console.log('Fetching data from:', url);
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        console.log('Error: ' + response.statusText);
+                        throw new Error('City not found or network error!');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API response:', data);
+
+                    if (data.current) {
+                        document.getElementById('error').textContent = '';
+                        document.getElementById('temperature').textContent = `Temperature: ${data.current.temp_c} °C`;
+                        document.getElementById('description').textContent = `Weather: ${data.current.condition.text}`;
+                        document.getElementById('humidity').textContent = `Humidity: ${data.current.humidity}%`;
+                        document.getElementById('windSpeed').textContent = `Wind Speed: ${data.current.wind_kph} kph`;
+                        document.getElementById('airQuality').textContent = `Air Quality Index (AQI): ${data.current.air_quality.us_epa_index}`;
+                    } else {
+                        document.getElementById('error').textContent = 'Error: Missing weather data.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('error').textContent = error.message;
+                });
+        });
+    </script>
+
+</body>
+</html>
